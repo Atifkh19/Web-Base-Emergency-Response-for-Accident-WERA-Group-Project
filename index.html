@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* INLINE STYLES (ensure layout consistency) */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: #040b1c;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      display: flex;
+      width: 1100px;
+      max-width: 90%;
+      background: #0c1429;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+    }
+
+    /* LEFT PANEL */
+    .left {
+      flex: 1;
+      background: linear-gradient(145deg, #0a1025, #050a1a);
+      padding: 35px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: 800;
+      color: #ff2d2d;
+    }
+
+    .back {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 14px;
+      border-bottom: 1px solid #ff2d2d;
+      padding-bottom: 2px;
+    }
+
+    .left-bottom p {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-top: 60px;
+      color: white;
+    }
+
+    .dots {
+      margin-top: 40px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .dots span {
+      width: 10px;
+      height: 10px;
+      background: #2a345a;
+      border-radius: 50%;
+    }
+
+    .dots .active {
+      background: #ff2d2d;
+      width: 28px;
+      border-radius: 12px;
+    }
+
+    /* RIGHT PANEL (FORM) */
+    .right {
+      flex: 1;
+      padding: 45px 40px;
+      background: #0f172f;
+    }
+
+    .right h1 {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .login-link {
+      margin-bottom: 30px;
+      color: #aaa;
+    }
+
+    .login-link a {
+      color: #ff2d2d;
+      text-decoration: none;
+    }
+
+    form input, select {
+      width: 100%;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      background: #1a2340;
+      border: 1px solid #2e3a5e;
+      border-radius: 14px;
+      color: white;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    form input:focus, select:focus {
+      border-color: #ff2d2d;
+    }
+
+    .name-fields {
+      display: flex;
+      gap: 15px;
+    }
+
+    .name-fields input, .name-fields select {
+      flex: 1;
+    }
+
+    .terms {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 15px 0 25px;
+    }
+
+    .terms input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+    }
+
+    .terms label {
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    .create-btn {
+      width: 100%;
+      background: #ff2d2d;
+      border: none;
+      padding: 14px;
+      border-radius: 40px;
+      font-weight: bold;
+      font-size: 16px;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .create-btn:hover {
+      background: #e01e1e;
+      transform: scale(0.98);
+    }
+
+    @media (max-width: 800px) {
+      .container { flex-direction: column; }
+      .left { padding: 25px; }
+      .left-bottom p { font-size: 24px; margin-top: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ACCOUNT FORM -->
+<div class="container">
+  <!-- LEFT BRAND -->
+  <div class="left">
+    <div class="top">
+      <div class="logo">WERA</div>
+      <a href="home.html" class="back">Back to Home</a>
+    </div>
+    <div class="left-bottom">
+      <p>Rapid Response,<br>Save Every Second</p>
+      <div class="dots"><span></span><span></span><span class="active"></span></div>
+    </div>
+  </div>
+
+  <!-- RIGHT FORM -->
+  <div class="right">
+    <h1>Create an account</h1>
+    <p class="login-link">Already have an account? <a href="login.html">Log in</a></p>
+
+    <form id="regForm">
+      <!-- ROLE -->
+      <div class="name-fields">
+        <select id="role" onchange="window.toggleRole()">
+          <option value="user">User</option>
+          <option value="dispatch">Dispatch</option>
+        </select>
+      </div>
+
+      <!-- DISPATCH STAFF ID -->
+      <div id="dispatchBox" style="display:none; margin-bottom:15px;">
+        <input type="text" id="staffId" placeholder="Staff ID (Dispatch only)">
+      </div>
+
+      <!-- NAMES -->
+      <div class="name-fields">
+        <input type="text" id="firstName" placeholder="First name">
+        <input type="text" id="lastName" placeholder="Last name">
+      </div>
+
+      <!-- EMAIL & PASSWORD -->
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Enter your password">
+
+      <!-- TERMS -->
+      <div class="terms">
+        <input type="checkbox" id="agree">
+        <label for="agree">I agree to the Terms & Conditions</label>
+      </div>
+
+      <!-- SUBMIT -->
+      <button type="submit" class="create-btn">Create account</button>
+    </form>
+  </div>
+</div>
+
+<!-- FIREBASE SCRIPT (MODULE) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // CONFIG
+  const firebaseConfig = {
+    apiKey: "AIzaSyCO9jXDjuNAVG7sqEq7M1vh42bsD_n60XQ",
+    authDomain: "wera-5d7af.firebaseapp.com",
+    projectId: "wera-5d7af",
+    storageBucket: "wera-5d7af.firebasestorage.app",
+    messagingSenderId: "975783139434",
+    appId: "1:975783139434:web:46ca6c60ee985492421213",
+    measurementId: "G-QEFP3J2LPY"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // TOGGLE DISPATCH FIELD
+  window.toggleRole = function() {
+    const role = document.getElementById("role").value;
+    const box = document.getElementById("dispatchBox");
+    box.style.display = (role === "dispatch") ? "block" : "none";
+  }
+
+  // REGISTRATION HANDLER
+  document.getElementById("regForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value.trim();
+    const role = document.getElementById("role").value;
+    const staffId = document.getElementById("staffId").value.trim();
+    const agree = document.getElementById("agree").checked;
+
+    // VALIDATIONS
+    if(!firstName || !lastName || !email || !password) { alert("Fill all fields"); return; }
+    if(!agree) { alert("Must agree to terms"); return; }
+    if(role === "dispatch" && !staffId) { alert("Staff ID required"); return; }
+
+    try {
+      // CHECK EXISTING
+      const q = query(collection(db, "wera_users"), where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        alert("Account already exists!");
+        return;
+      }
+
+      // STORE USER
+      await addDoc(collection(db, "wera_users"), {
+        firstName, lastName, email, password, role,
+        staffId: role === "dispatch" ? staffId : null,
+        createdAt: new Date()
+      });
+
+      alert("Account created successfully!");
+      window.location.href = "login.html";
+    } catch (error) {
+      console.error("Error creating account:", error);
+      alert("Database error. Please try again.");
+    }
+  });
+</script>
+
+</body>
+</html>

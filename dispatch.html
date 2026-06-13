@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dispatch Dashboard</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+/* RESET */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+/* BODY */
+body{
+  background:#0b1220;
+  color:#e5e7eb;
+  min-height:100vh;
+  display:flex;
+  overflow-x:hidden;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:300px;
+  background:#0f172a;
+  padding:20px;
+  border-right:1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.logo{
+  font-size:18px;
+  font-weight:bold;
+  letter-spacing:2px;
+  margin-bottom:20px;
+  color:#f43f5e;
+}
+
+/* CARDS */
+.card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
+}
+
+.card h3{
+  font-size:11px;
+  opacity:0.6;
+  margin-bottom:10px;
+  letter-spacing: 1px;
+}
+
+.card p{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.status-alert{
+  color:#ef4444;
+}
+
+/* FLEET */
+.fleet-group {
+  margin-top: 5px;
+}
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.dot-avail { background: #22c55e; }
+.dot-route { background: #f97316; }
+.dot-mission { background: #3b82f6; }
+.dot-unavail { background: #ef4444; }
+
+.count-badge {
+  font-weight: bold;
+  background: rgba(255,255,255,0.05);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  height: 100vh;
+  position: relative;
+}
+
+/* TOPBAR */
+.topbar{
+  height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  background:#0f172a;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.topbar h2{
+  font-size:14px;
+  letter-spacing:2px;
+}
+
+.home-btn{
+  padding:8px 14px;
+  background:#1f2937;
+  border:1px solid rgba(255,255,255,0.1);
+  color:#e5e7eb;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight: bold;
+}
+
+.home-btn:hover{
+  background:#334155;
+}
+
+/* MAP */
+#map{
+  flex:1;
+  z-index:1;
+  background: #0f172a;
+}
+
+/* INFO PANEL */
+.info-panel{
+  width:380px;
+  background:#0f172a;
+  border-left:1px solid rgba(255,255,255,0.06);
+  padding:20px;
+  overflow-y:auto;
+  height: 100vh;
+}
+
+.info-title{
+  font-size:14px;
+  font-weight:bold;
+  margin-bottom:15px;
+  letter-spacing:1px;
+  color: #f43f5e;
+}
+
+/* LIST ITEMS */
+.list-item{
+  padding:16px;
+  background:rgba(255,255,255,0.03);
+  border-radius:10px;
+  margin-bottom:14px;
+  font-size:13px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+/* AI BOX */
+.ai-staff-box {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px dashed rgba(59, 130, 246, 0.3);
+  padding: 12px;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #60a5fa;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.ai-text {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #93c5fd;
+}
+
+/* STATUS PILLS */
+.status-pill {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  margin-top: 5px;
+  background: #374151;
+}
+
+.status-dispatched { background: #1e3a8a; color: #3b82f6; border: 1px solid #2563eb; }
+.status-pending { background: #78350f; color: #f59e0b; border: 1px solid #d97706; }
+
+/* FORMS */
+select{
+  background:#111827;
+  color:white;
+  border:1px solid rgba(255,255,255,0.1);
+  padding:10px;
+  border-radius:6px;
+  width:100%;
+  outline:none;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+input[type="checkbox"], input[type="radio"]{
+  accent-color:#3b82f6;
+  transform:scale(1.1);
+  margin-right:8px;
+  vertical-align: middle;
+}
+
+.station-selection-box {
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.station-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.distance-badge {
+  font-size: 11px;
+  font-weight: bold;
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.distance-badge.closest {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.list-item label{
+  cursor: pointer;
+  margin-right: 12px;
+}
+
+.list-item button{
+  background:#1e293b;
+  color:white;
+  border:none;
+  padding:10px 14px;
+  border-radius:6px;
+  cursor:pointer;
+  margin-right:5px;
+  margin-top:12px;
+  font-weight: bold;
+  transition:0.2s;
+  font-size: 12px;
+}
+
+.list-item button:hover{ background:#334155; }
+.dispatch-btn{ background:#2563eb !important; }
+.dispatch-btn:hover{ background:#3b82f6 !important; }
+.clear-btn{ background:#dc2626 !important; }
+.clear-btn:hover{ background:#ef4444 !important; }
+
+/* RADIO NOTIFICATION */
+#radioNotification {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(150%);
+  background: #0f172a;
+  border: 2px solid #3b82f6;
+  padding: 14px 24px;
+  border-radius: 8px;
+  z-index: 9999;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#radioNotification.show {
+  transform: translateX(-50%) translateY(0);
+}
+.radio-badge {
+  background: #2563eb;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 3px 6px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+
+/* RADAR ANIMATION */
+@keyframes pulseRadar {
+  0% { transform: scale(0.2); opacity: 0.8; }
+  80% { opacity: 0.3; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.radar-glow-container {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+.radar-ring {
+  border: 2px solid #ef4444;
+  background: transparent;
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  animation: pulseRadar 1.8s ease-out infinite;
+}
+.radar-center {
+  background: #ef4444;
+  border-radius: 50%;
+  height: 10px;
+  width: 10px;
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  box-shadow: 0 0 8px #ff7878;
+}
+
+/* VEHICLE ICON */
+.vehicle-icon {
+  font-size: 22px;
+  text-align: center;
+  line-height: 1;
+  transition: transform 0.15s ease-out;
+  filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  body { flex-direction: column; height: auto; overflow-y: auto; }
+  .sidebar, .main, .info-panel { width: 100%; height: auto; }
+  #map { height: 450px; }
+  .info-panel { border-left: none; border-top: 1px solid rgba(255,255,255,0.06); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUDIO SETUP -->
+<script>
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playRadioChime() {
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  let osc = audioCtx.createOscillator();
+  let gain = audioCtx.createGain();
+  
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); 
+  osc.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.12); 
+  
+  gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+  
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.4);
+}
+
+function speakDispatchVoice(rawHtmlMessage) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel(); 
+
+  const cleanText = rawHtmlMessage.replace(/<[^>]*>/g, ' ');
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  const voices = window.speechSynthesis.getVoices();
+  
+  const femaleVoice = voices.find(voice => 
+    (voice.name.includes('Zira') || 
+     voice.name.includes('Female') || 
+     voice.name.includes('Google US English') || 
+     voice.name.includes('Samantha') ||
+     voice.name.includes('Hazel')) && voice.lang.startsWith('en')
+  );
+
+  if (femaleVoice) utterance.voice = femaleVoice;
+  utterance.rate = 0.95;  
+  utterance.pitch = 1.05; 
+  utterance.volume = 1.0;  
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function sendRadioTransmission(message) {
+  playRadioChime();
+  
+  const toast = document.getElementById("radioNotification");
+  document.getElementById("radioText").innerHTML = message;
+  toast.classList.add("show");
+  
+  setTimeout(() => {
+    speakDispatchVoice(message);
+  }, 250);
+
+  setTimeout(() => toast.classList.remove("show"), 5500);
+}
+
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.getVoices();
+  if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = window.speechSynthesis.getVoices;
+  }
+}
+</script>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">DISPATCH CORE</div>
+
+  <div class="card">
+    <h3>ACTIVE INCIDENTS</h3>
+    <p class="status-alert" id="activeCount">0</p>
+  </div>
+
+  <div class="card">
+    <h3>POLICE FLEET</h3>
+    <div class="fleet-group">
+      <div class="status-row"><span><span class="status-dot dot-avail"></span>Available</span><span class="count-badge" id="pol-avail">12</span></div>
+      <div class="status-row"><span><span class="status-dot dot-route"></span>En Route</span><span class="count-badge" id="pol-route">0</span></div>
+      <div class="status-row"><span><span class="status-dot dot-mission"></span>On Mission</span><span class="count-badge" id="pol-mission">0</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>AMBULANCE FLEET</h3>
+    <div class="fleet-group">
+      <div class="status-row"><span><span class="status-dot dot-avail"></span>Available</span><span class="count-badge" id="amb-avail">8</span></div>
+      <div class="status-row"><span><span class="status-dot dot-route"></span>En Route</span><span class="count-badge" id="amb-route">0</span></div>
+      <div class="status-row"><span><span class="status-dot dot-mission"></span>On Mission</span><span class="count-badge" id="amb-mission">0</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>FIRE TRUCK FLEET</h3>
+    <div class="fleet-group">
+      <div class="status-row"><span><span class="status-dot dot-avail"></span>Available</span><span class="count-badge" id="fire-avail">6</span></div>
+      <div class="status-row"><span><span class="status-dot dot-route"></span>En Route</span><span class="count-badge" id="fire-route">0</span></div>
+      <div class="status-row"><span><span class="status-dot dot-mission"></span>On Mission</span><span class="count-badge" id="fire-mission">0</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>AVG RESPONSE TIME</h3>
+    <p id="responseTimeDisplay">Calculating...</p>
+  </div>
+</div>
+
+<!-- MAIN + MAP -->
+<div class="main">
+  <div class="topbar">
+    <h2>EMERGENCY MANAGEMENT MAP - MUSCAT</h2>
+    <button class="home-btn" onclick="window.location.href='home.html'">HOME</button>
+  </div>
+
+  <div id="map"></div>
+
+  <div id="radioNotification">
+    <span class="radio-badge">RADIO LOG</span>
+    <span id="radioText" style="font-size:12px; font-weight:bold; color:#fff;">Channel open. Monitoring units...</span>
+  </div>
+</div>
+
+<!-- INFO PANEL -->
+<div class="info-panel">
+  <div class="info-title">LIVE DISPATCH QUEUE</div>
+  <div id="reports"></div>
+</div>
+
+<!-- FIREBASE SCRIPT -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyCO9jXDjuNAVG7sqEq7M1vh42bsD_n60XQ",
+  authDomain: "wera-5d7af.firebaseapp.com",
+  projectId: "wera-5d7af",
+  storageBucket: "wera-5d7af.firebasestorage.app",
+  messagingSenderId: "975783139434",
+  appId: "1:975783139434:web:46ca6c60ee985492421213",
+  measurementId: "G-QEFP3J2LPY"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// OUTPOSTS
+const OUTPOSTS = {
+  Mabila: { name: "Mabila Station", lat: 23.6438, lon: 58.1184 },
+  Khoudh: { name: "Al Khoudh Station", lat: 23.6231, lon: 58.2045 },
+  Seeb: { name: "Seeb Hub", lat: 23.6811, lon: 58.1812 },
+  AlKhuwair: { name: "Al Khuwair HQ", lat: 23.5972, lon: 58.4234 },
+  Baushar: { name: "Baushar Station", lat: 23.5518, lon: 58.3905 },
+  Muttrah: { name: "Muttrah Station", lat: 23.6214, lon: 58.5615 }
+};
+
+// MAP INIT
+const map = L.map('map').setView([23.5880, 58.3829], 11);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors',
+  maxZoom: 19
+}).addTo(map);
+
+// OUTPOST MARKERS
+Object.keys(OUTPOSTS).forEach(key => {
+  const op = OUTPOSTS[key];
+  L.circle([op.lat, op.lon], {
+    color: '#3b82f6',
+    fillColor: '#2563eb',
+    fillOpacity: 0.25,
+    radius: 600,
+    weight: 2
+  }).addTo(map).bindPopup(`<b>${op.name}</b><br>Active Operational Base`);
+});
+
+// GLOBALS
+let staticIncidentLayers = []; 
+let activeMovingVehicles = []; 
+let localFormState = {};
+let currentCloudReports = [];
+
+let operationalFleetState = {
+  police: { avail: 12, route: 0, mission: 0 },
+  ambulance: { avail: 8, route: 0, mission: 0 },
+  fire: { avail: 6, route: 0, mission: 0 }
+};
+
+// HELPER: DISTANCE
+function getHaversineDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; 
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// ARCHIVE LOG
+async function archiveIncidentToLog(reportIdStr, clearReason, finalResponseTimeMin = null) {
+  try {
+    const reportInstance = currentCloudReports.find(r => String(r.id) === reportIdStr);
+    const localState = localFormState[reportIdStr] || {};
+    
+    if (!reportInstance) return;
+
+    const logData = {
+      originalReportId: reportIdStr,
+      incidents: reportInstance.incidents || [],
+      location: reportInstance.location || "",
+      reportedTime: reportInstance.time || "N/A",
+      priorityAssessment: localState.priority || reportInstance.priority || "MEDIUM",
+      assignedUnits: localState.units || reportInstance.assignedUnits || [],
+      respondingStation: localState.selectedStation || "Not Assigned",
+      clearedBy: clearReason, 
+      loggedTimestamp: Date.now(),
+      responseTimeMinutes: finalResponseTimeMin ? parseFloat(finalResponseTimeMin.toFixed(2)) : "N/A",
+      callerName: reportInstance.name || "Unknown Caller",
+      callerPhone: reportInstance.phone || reportInstance.phoneNumber || "Not Provided",
+      callerCivilID: reportInstance.civilId || "N/A",
+      deviceBattery: reportInstance.batteryStatus || "N/A",
+      additionalNotes: reportInstance.notes || "None"
+    };
+
+    const logRef = doc(collection(db, "wera_logs"));
+    await setDoc(logRef, logData);
+  } catch (err) {
+    console.error("Failed to write to archive logs: ", err);
+  }
+}
+
+// AI SUGGESTION
+function generateAISuggestion(incidents, closestStationName, distanceKm) {
+  const matchStr = incidents.join(" ").toLowerCase();
+  
+  let natureOfIncident = "General Evaluation Needed";
+  let priorityLevel = "MEDIUM";
+  let colorHex = "#f59e0b"; 
+
+  if (matchStr.includes("breathing") || matchStr.includes("heart") || matchStr.includes("stroke") || matchStr.includes("unconscious")) {
+    natureOfIncident = "🚨 Acute Medical Emergency / Critical Care";
+    priorityLevel = "CRITICAL";
+    colorHex = "#ef4444"; 
+  } else if (matchStr.includes("fire") || matchStr.includes("gas") || matchStr.includes("collapse")) {
+    natureOfIncident = "🔥 Structural Fire / Hazardous Threat";
+    priorityLevel = "HIGH";
+    colorHex = "#f97316"; 
+  } else if (matchStr.includes("crash") || matchStr.includes("accident") || matchStr.includes("pedestrian")) {
+    natureOfIncident = "🚗 Traffic Collision / Road Incident";
+    priorityLevel = "HIGH";
+    colorHex = "#f97316"; 
+  } else if (matchStr.includes("robbery") || matchStr.includes("assault") || matchStr.includes("break-in")) {
+    natureOfIncident = "👮 Public Safety / Police Matter";
+    priorityLevel = "HIGH";
+    colorHex = "#f97316"; 
+  }
+
+  return `
+    <b>Nature:</b> ${natureOfIncident}<br>
+    <b>Recommended Priority:</b> <span style="color:${colorHex}; font-weight:bold;">${priorityLevel} PRIORITY</span><br>
+    <b>Logistics:</b> Dispatch from <b>${closestStationName}</b> (${distanceKm.toFixed(1)} km logistics radius).
+  `;
+}
+
+// RENDER UI
+function renderReportsUI(data) {
+  currentCloudReports = data;
+  document.getElementById("activeCount").innerText = data.length;
+  const reportsContainer = document.getElementById("reports");
+  
+  staticIncidentLayers.forEach(layer => map.removeLayer(layer));
+  staticIncidentLayers = [];
+
+  let htmlContent = "";
+
+  if (data.length === 0) {
+    reportsContainer.innerHTML = '<p style="opacity:0.5; font-size:12px;">No active emergency reports incoming.</p>';
+    refreshSidebarFleetUI();
+    return;
+  }
+
+  data.forEach(r => {
+    const rIdStr = String(r.id);
+    r.priority = r.priority || "MEDIUM";
+    r.assignedUnits = r.assignedUnits || [];
+    r.status = r.status || "PENDING";
+    r.incidents = r.incidents || ["Unknown Emergency"];
+
+    let targetLat = 23.5880, targetLon = 58.3829;
+    if (r.location && r.location.includes(",")) {
+      const coords = r.location.match(/-?\d+\.\d+/g);
+      if (coords && coords.length >= 2) {
+        targetLat = parseFloat(coords[0]);
+        targetLon = parseFloat(coords[1]);
+      }
+    }
+
+    const distMabila = getHaversineDistance(targetLat, targetLon, OUTPOSTS.Mabila.lat, OUTPOSTS.Mabila.lon);
+    const distKhoudh = getHaversineDistance(targetLat, targetLon, OUTPOSTS.Khoudh.lat, OUTPOSTS.Khoudh.lon);
+    const distSeeb = getHaversineDistance(targetLat, targetLon, OUTPOSTS.Seeb.lat, OUTPOSTS.Seeb.lon);
+    const distAlKhuwair = getHaversineDistance(targetLat, targetLon, OUTPOSTS.AlKhuwair.lat, OUTPOSTS.AlKhuwair.lon);
+    const distBaushar = getHaversineDistance(targetLat, targetLon, OUTPOSTS.Baushar.lat, OUTPOSTS.Baushar.lon);
+    const distMuttrah = getHaversineDistance(targetLat, targetLon, OUTPOSTS.Muttrah.lat, OUTPOSTS.Muttrah.lon);
+
+    const minDist = Math.min(distMabila, distKhoudh, distSeeb, distAlKhuwair, distBaushar, distMuttrah);
+    let nearestStationKey = "AlKhuwair";
+    if (minDist === distMabila) nearestStationKey = "Mabila";
+    if (minDist === distKhoudh) nearestStationKey = "Khoudh";
+    if (minDist === distSeeb) nearestStationKey = "Seeb";
+    if (minDist === distBaushar) nearestStationKey = "Baushar";
+    if (minDist === distMuttrah) nearestStationKey = "Muttrah";
+
+    if (!localFormState[rIdStr]) {
+      const matchStr = r.incidents.join(" ").toLowerCase();
+      let derivedPriority = "MEDIUM";
+      if (matchStr.includes("breathing") || matchStr.includes("heart") || matchStr.includes("stroke") || matchStr.includes("unconscious") || matchStr.includes("fire") || matchStr.includes("crash")) {
+        derivedPriority = "HIGH";
+      }
+
+      localFormState[rIdStr] = { 
+        priority: derivedPriority, 
+        units: [...r.assignedUnits],
+        selectedStation: nearestStationKey 
+      };
+    }
+
+    const state = localFormState[rIdStr];
+    const statusClass = r.status === "DISPATCHED" ? "status-dispatched" : "status-pending";
+    const aiTextContent = generateAISuggestion(r.incidents, OUTPOSTS[nearestStationKey].name, minDist);
+
+    htmlContent += `
+      <div class="list-item" id="item-${rIdStr}">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <b style="font-size:14px; color:#fff;">${r.incidents.join(", ")}</b>
+          <span class="status-pill ${statusClass}">${r.status}</span>
+        </div>
+        
+        <p style="margin: 6px 0 2px 0; opacity:0.8;">📍 ${r.location}</p>
+        <p style="font-size:12px; margin-bottom:10px; color:#3b82f6;">👤 Caller: ${r.name || 'Unknown'} (${r.phone || r.phoneNumber || 'No Phone'})</p>
+        <p style="font-size:11px; opacity:0.6; margin-bottom:10px;">🕒 Received: ${r.time || 'N/A'}</p>
+
+        <div class="ai-staff-box">
+          <div class="ai-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            AI DISPATCH ANALYSIS
+          </div>
+          <div class="ai-text">${aiTextContent}</div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.06); margin-bottom:10px;">
+
+        <b style="font-size:12px; display:block; margin-bottom:6px;">Select Responding Station:</b>
+        <div class="station-selection-box">
+          <div class="station-row">
+            <label><input type="radio" name="station-choice-${rIdStr}" value="Mabila" onchange="window.updateSelectedStation('${rIdStr}', 'Mabila')" ${state.selectedStation === 'Mabila' ? 'checked' : ''}> Mabila Station</label>
+            <span class="distance-badge ${nearestStationKey === 'Mabila' ? 'closest' : ''}">${distMabila.toFixed(1)} km ${nearestStationKey === 'Mabila' ? '★ Nearest' : ''}</span>
+          </div>
+          <div class="station-row">
+            <label><input type="radio" name="station-choice-${rIdStr}" value="Khoudh" onchange="window.updateSelectedStation('${rIdStr}', 'Khoudh')" ${state.selectedStation === 'Khoudh' ? 'checked' : ''}> Al Khoudh Station</label>
+            <span class="distance-badge ${nearestStationKey === 'Khoudh' ? 'closest' : ''}">${distKhoudh.toFixed(1)} km ${nearestStationKey === 'Khoudh' ? '★ Nearest' : ''}</span>
+          </div>
+          <div class="station-row">
+            <label><input type="radio" name="station-choice-${rIdStr}" value="Seeb" onchange="window.updateSelectedStation('${rIdStr}', 'Seeb')" ${state.selectedStation === 'Seeb' ? 'checked' : ''}> Seeb Hub</label>
+            <span class="distance-badge ${nearestStationKey === 'Seeb' ? 'closest' : ''}">${distSeeb.toFixed(1)} km ${nearestStationKey === 'Seeb' ? '★ Nearest' : ''}</span>
+          </div>
+          <div class="station-row">
+            <label><input type="radio" name="station-choice-${rIdStr}" value="AlKhuwair" onchange="window.updateSelectedStation('${rIdStr}', 'AlKhuwair')" ${state.selectedStation === 'AlKhuwair' ? 'checked' : ''}> Al Khuwair HQ</label>
+            <span class="distance-badge ${nearestStationKey === 'AlKhuwair' ? 'closest' : ''}">${distAlKhuwair.toFixed(1)} km ${nearestStationKey === 'AlKhuwair' ? '★ Nearest' : ''}</span>
+          </div>
+          <div class="station-row">
+            <label><input type="radio" name="station-choice-${rIdStr}" value="Baushar" onchange="window.updateSelectedStation('${rIdStr}', 'Baushar')" ${state.selectedStation === 'Baushar' ? 'checked' : ''}> Baushar Station</label>
+            <span class="distance-badge ${nearestStationKey === 'Baushar' ? 'closest' : ''}">${distBaushar.toFixed(1)} km ${nearestStationKey === 'Baushar' ? '★ Nearest' : ''}</span>
+          </div>
+          <div class="station-row">
+            <label><input type="radio" name="station-choice-${rIdStr}" value="Muttrah" onchange="window.updateSelectedStation('${rIdStr}', 'Muttrah')" ${state.selectedStation === 'Muttrah' ? 'checked' : ''}> Muttrah Station</label>
+            <span class="distance-badge ${nearestStationKey === 'Muttrah' ? 'closest' : ''}">${distMuttrah.toFixed(1)} km ${nearestStationKey === 'Muttrah' ? '★ Nearest' : ''}</span>
+          </div>
+        </div>
+
+        <b style="margin-top:10px; display:block;">Assign Emergency Units:</b>
+        <div style="margin-top:8px;">
+          <label><input type="checkbox" onchange="window.cacheUnit('${rIdStr}', 'Police', this.checked)" ${state.units.includes("Police") ? "checked" : ""}> Police</label>
+          <label><input type="checkbox" onchange="window.cacheUnit('${rIdStr}', 'Ambulance', this.checked)" ${state.units.includes("Ambulance") ? "checked" : ""}> Ambulance</label>
+          <label><input type="checkbox" onchange="window.cacheUnit('${rIdStr}', 'Firefighter', this.checked)" ${state.units.includes("Firefighter") ? "checked" : ""}> Fire Truck</label>
+        </div>
+
+        <div style="margin-top:10px;">
+          <b style="display:block; margin-bottom:4px;">Set Priority Assessment:</b>
+          <select onchange="window.cachePriority('${rIdStr}', this.value)">
+            <option value="LOW" ${state.priority === "LOW" ? "selected" : ""}>🟢 LOW PRIORITY</option>
+            <option value="MEDIUM" ${state.priority === "MEDIUM" ? "selected" : ""}>🟡 MEDIUM PRIORITY</option>
+            <option value="HIGH" ${state.priority === "HIGH" ? "selected" : ""}>🔴 HIGH PRIORITY</option>
+          </select>
+        </div>
+
+        <button class="dispatch-btn" onclick="window.executeDispatch('${rIdStr}')">DISPATCH COMMAND</button>
+        <button class="clear-btn" onclick="window.removeReport('${rIdStr}')">CLEAR</button>
+      </div>
+    `;
+
+    if (r.location && r.location.includes(",")) {
+      if (!isNaN(targetLat) && !isNaN(targetLon)) {
+        const radarMarkerIcon = L.divIcon({
+          html: `<div class="radar-glow-container"><div class="radar-ring"></div><div class="radar-center"></div></div>`,
+          className: 'custom-radar-marker',
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        });
+
+        const marker = L.marker([targetLat, targetLon], { icon: radarMarkerIcon }).addTo(map);
+        marker.bindPopup(`<b style="color:#ef4444;">🚨 Incident: ${r.incidents.join(", ")}</b><br>Caller: ${r.name || 'Unknown'}<br>Status: ${r.status}`);
+        staticIncidentLayers.push(marker);
+
+        let radiusValue = 25; 
+        const accuracyMatch = r.location.match(/±(\d+\.?\d*)m/);
+        if (accuracyMatch && accuracyMatch[1]) radiusValue = parseFloat(accuracyMatch[1]);
+
+        const circle = L.circle([targetLat, targetLon], { 
+          color: '#ef4444', 
+          fillColor: '#ef4444', 
+          fillOpacity: 0.08, 
+          radius: radiusValue, 
+          weight: 1 
+        }).addTo(map);
+        staticIncidentLayers.push(circle);
+      }
+    }
+  });
+
+  reportsContainer.innerHTML = htmlContent;
+  refreshSidebarFleetUI();
+}
+
+// SIDEBAR UPDATE
+function refreshSidebarFleetUI() {
+  document.getElementById("pol-avail").innerText = operationalFleetState.police.avail;
+  document.getElementById("pol-route").innerText = operationalFleetState.police.route;
+  document.getElementById("pol-mission").innerText = operationalFleetState.police.mission;
+
+  document.getElementById("amb-avail").innerText = operationalFleetState.ambulance.avail;
+  document.getElementById("amb-route").innerText = operationalFleetState.ambulance.route;
+  document.getElementById("amb-mission").innerText = operationalFleetState.ambulance.mission;
+
+  document.getElementById("fire-avail").innerText = operationalFleetState.fire.avail;
+  document.getElementById("fire-route").innerText = operationalFleetState.fire.route;
+  document.getElementById("fire-mission").innerText = operationalFleetState.fire.mission;
+
+  const dispatchedItems = currentCloudReports.filter(r => r.status === "DISPATCHED" && r.dispatchedTimestamp);
+  if (dispatchedItems.length === 0) {
+    document.getElementById("responseTimeDisplay").innerText = "4.2 min";
+  } else {
+    let cumulative = 0;
+    dispatchedItems.forEach(item => { 
+      const rawDiff = item.dispatchedTimestamp - (item.numericId || Date.now());
+      cumulative += (rawDiff / 1000); 
+    });
+    let calculatedAvg = (cumulative / dispatchedItems.length) / 60;
+    document.getElementById("responseTimeDisplay").innerText = `${Math.max(2.1, Math.abs(calculatedAvg)).toFixed(1)} min`;
+  }
+}
+
+// HEADING CALC
+function calculateHeadingAngle(lat1, lon1, lat2, lon2) {
+  const dLon = (lon2 - lon1);
+  const dLat = (lat2 - lat1);
+  const headingDegrees = Math.atan2(dLon, dLat) * 180 / Math.PI;
+  return headingDegrees;
+}
+
+// VEHICLE DEPLOY
+async function deployVehicleMarker(type, stationKey, targetLat, targetLon, callSign, reportIdStr) {
+  let fleetKey = type === "🚓" ? "police" : type === "🚑" ? "ambulance" : "fire";
+  const sourceStation = OUTPOSTS[stationKey] || OUTPOSTS.AlKhuwair;
+  
+  if (operationalFleetState[fleetKey].avail > 0) {
+    operationalFleetState[fleetKey].avail--;
+    operationalFleetState[fleetKey].route++;
+    refreshSidebarFleetUI();
+  }
+
+  const customIcon = L.divIcon({
+    html: `<div class="vehicle-icon" id="icon-v-${callSign}-${reportIdStr}">${type}</div>`,
+    className: 'custom-moving-icon',
+    iconSize: [26, 26],
+    iconAnchor: [13, 13]
+  });
+
+  let vehicleMarker = L.marker([sourceStation.lat, sourceStation.lon], { icon: customIcon }).addTo(map);
+  vehicleMarker.bindPopup(`<b>${callSign}</b><br><span style="color:#f97316;">En Route from ${sourceStation.name}</span>`);
+  activeMovingVehicles.push(vehicleMarker);
+
+  sendRadioTransmission(`🎙️ <b>${callSign}</b>: Dispatched from <b>${sourceStation.name}</b>. Calculating optimal emergency route...`);
+
+  try {
+    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${sourceStation.lon},${sourceStation.lat};${targetLon},${targetLat}?overview=full&geometries=geojson`;
+    const response = await fetch(osrmUrl);
+    const routeData = await response.json();
+
+    if (!routeData.routes || routeData.routes.length === 0) {
+      throw new Error("Route calculation error");
+    }
+
+    const coordinates = routeData.routes[0].geometry.coordinates; 
+    const polylineColor = type === "🚓" ? "#3b82f6" : type === "🚑" ? "#eab308" : "#ef4444";
+    
+    let routeLine = L.polyline(coordinates.map(coord => [coord[1], coord[0]]), {
+      color: polylineColor,
+      weight: 4,
+      opacity: 0.75,
+      lineCap: 'round',
+      lineJoin: 'round'
+    }).addTo(map);
+
+    let currentCoordIndex = 0;
+    const totalSteps = coordinates.length;
+    const stepIntervalTime = 80; 
+
+    let driveInterval = setInterval(() => {
+      if (currentCoordIndex >= totalSteps) {
+        clearInterval(driveInterval);
+        map.removeLayer(routeLine); 
+        
+        operationalFleetState[fleetKey].route--;
+        operationalFleetState[fleetKey].mission++;
+        refreshSidebarFleetUI();
+        
+        vehicleMarker.bindPopup(`<b>${callSign}</b><br><span style="color:#3b82f6;">On Scene (Arrived)</span>`);
+        sendRadioTransmission(`🚨 <b>${callSign}</b>: Arrived at coordinates. Setting up traffic controls.`);
+
+        setTimeout(async () => {
+          operationalFleetState[fleetKey].mission--;
+          operationalFleetState[fleetKey].avail++;
+          
+          map.removeLayer(vehicleMarker);
+          activeMovingVehicles = activeMovingVehicles.filter(v => v !== vehicleMarker);
+          
+          sendRadioTransmission(`🟢 <b>${callSign}</b>: Incident handled. Returning to base.`);
+          
+          let reportInstance = currentCloudReports.find(r => String(r.id) === reportIdStr);
+          let responseTimeMin = null;
+          if (reportInstance && reportInstance.dispatchedTimestamp) {
+            let startTime = reportInstance.numericId || Date.now();
+            responseTimeMin = (reportInstance.dispatchedTimestamp - startTime) / 60000; 
+          }
+          
+          await archiveIncidentToLog(reportIdStr, "AUTOMATIC_ARRIVAL", responseTimeMin);
+
+          try {
+            await deleteDoc(doc(db, "wera_reports", reportIdStr));
+            delete localFormState[reportIdStr];
+          } catch (err) {
+            console.error("Error auto-clearing record: ", err);
+          }
+        }, 7000); 
+
+        return;
+      }
+
+      const nextLngLat = coordinates[currentCoordIndex];
+      const prevLngLat = currentCoordIndex > 0 ? coordinates[currentCoordIndex - 1] : [sourceStation.lon, sourceStation.lat];
+      
+      const currentAngle = calculateHeadingAngle(prevLngLat[1], prevLngLat[0], nextLngLat[1], nextLngLat[0]);
+      vehicleMarker.setLatLng([nextLngLat[1], nextLngLat[0]]);
+      
+      const DOMicon = document.getElementById(`icon-v-${callSign}-${reportIdStr}`);
+      if (DOMicon) {
+        DOMicon.style.transform = `rotate(${currentAngle}deg)`;
+      }
+
+      currentCoordIndex++;
+    }, stepIntervalTime);
+
+  } catch (error) {
+    let currentLat = sourceStation.lat;
+    let currentLon = sourceStation.lon;
+    const fallbackSteps = 100; 
+    let currentStep = 0;
+    const dLat = (targetLat - currentLat) / fallbackSteps;
+    const dLon = (targetLon - currentLon) / fallbackSteps;
+
+    let fallbackInterval = setInterval(() => {
+      currentStep++;
+      currentLat += dLat;
+      currentLon += dLon;
+      vehicleMarker.setLatLng([currentLat, currentLon]);
+
+      if (currentStep >= fallbackSteps) {
+        clearInterval(fallbackInterval);
+        operationalFleetState[fleetKey].route--;
+        operationalFleetState[fleetKey].mission++;
+        refreshSidebarFleetUI();
+        setTimeout(async () => {
+          operationalFleetState[fleetKey].mission--;
+          operationalFleetState[fleetKey].avail++;
+          map.removeLayer(vehicleMarker);
+          
+          await archiveIncidentToLog(reportIdStr, "AUTOMATIC_ARRIVAL_FALLBACK");
+          await deleteDoc(doc(db, "wera_reports", reportIdStr));
+          delete localFormState[reportIdStr];
+        }, 8000);
+      }
+    }, 60);
+  }
+}
+
+// WINDOW METHODS
+window.updateSelectedStation = function(id, stationKey) {
+  if (localFormState[id]) localFormState[id].selectedStation = stationKey;
+};
+
+window.cacheUnit = function(id, unitName, isChecked) {
+  if (!localFormState[id]) return;
+  if (isChecked) {
+    if (!localFormState[id].units.includes(unitName)) localFormState[id].units.push(unitName);
+  } else {
+    localFormState[id].units = localFormState[id].units.filter(u => u !== unitName);
+  }
+};
+
+window.cachePriority = function(id, val) {
+  if (localFormState[id]) localFormState[id].priority = val;
+};
+
+window.removeReport = async function(id) {
+  try {
+    let reportInstance = currentCloudReports.find(r => String(r.id) === id);
+    let responseTimeMin = null;
+    
+    if (reportInstance && reportInstance.dispatchedTimestamp) {
+      let startTime = reportInstance.numericId || Date.now();
+      responseTimeMin = (reportInstance.dispatchedTimestamp - startTime) / 60000;
+    }
+
+    await archiveIncidentToLog(id, "MANUAL_DISPATCHER_CLEAR", responseTimeMin);
+    
+    await deleteDoc(doc(db, "wera_reports", id));
+    delete localFormState[id];
+  } catch(err) {
+    console.error("Cloud delete failure: ", err);
+  }
+};
+
+window.executeDispatch = async function(id) {
+  const state = localFormState[id];
+  let reportInstance = currentCloudReports.find(r => String(r.id) === id);
+
+  if (!reportInstance || reportInstance.status === "DISPATCHED") return;
+
+  const coords = reportInstance.location.match(/-?\d+\.\d+/g);
+  if (!coords || coords.length < 2) return;
+  const targetLat = parseFloat(coords[0]);
+  const targetLon = parseFloat(coords[1]);
+
+  try {
+    const docRef = doc(db, "wera_reports", id);
+    await updateDoc(docRef, {
+      status: "DISPATCHED",
+      dispatchedTimestamp: Date.now(),
+      priority: state ? state.priority : "MEDIUM",
+      assignedUnits: state ? [...state.units] : []
+    });
+  } catch(err) {
+    console.error("Cloud status update failed: ", err);
+    return;
+  }
+
+  if (state && state.units.length > 0) {
+    state.units.forEach(u => {
+      const selectedStationKey = state.selectedStation;
+      if (u === "Police") deployVehicleMarker("🚓", selectedStationKey, targetLat, targetLon, "POLICE-PATROL", id);
+      if (u === "Ambulance") deployVehicleMarker("🚑", selectedStationKey, targetLat, targetLon, "MEDIC-UNIT", id);
+      if (u === "Firefighter") deployVehicleMarker("🚒", selectedStationKey, targetLat, targetLon, "FIRE-TRUCK", id);
+    });
+  }
+};
+
+// FIRESTORE LISTENER
+onSnapshot(collection(db, "wera_reports"), (snapshot) => {
+  const reportsList = [];
+  snapshot.forEach((doc) => {
+    const cloudData = doc.data();
+    reportsList.push({
+      id: doc.id,
+      numericId: cloudData.id || Date.now(),
+      location: cloudData.location || "",
+      time: cloudData.time || "",
+      status: cloudData.status || "PENDING",
+      incidents: cloudData.incidents || ["Emergency Call"],
+      priority: cloudData.priority || "MEDIUM",
+      assignedUnits: cloudData.assignedUnits || [],
+      dispatchedTimestamp: cloudData.dispatchedTimestamp || null,
+      name: cloudData.name || cloudData.callerName || "",
+      phone: cloudData.phone || cloudData.phoneNumber || "",
+      civilId: cloudData.civilId || cloudData.civilID || "",
+      batteryStatus: cloudData.batteryStatus || "",
+      notes: cloudData.notes || ""
+    });
+  });
+  renderReportsUI(reportsList);
+}, (error) => {
+  console.error("Firestore link error: ", error);
+});
+</script>
+
+</body>
+</html>

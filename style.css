@@ -1,0 +1,218 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* BODY */
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(125deg, #2c2c2c, #221741);
+}
+
+/* CONTAINER */
+.container {
+  display: flex;
+  width: 900px;
+  height: 520px;
+  background: #2b2738;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+/* LEFT PANEL */
+.left {
+  width: 45%;
+  background:
+    linear-gradient(180deg, rgba(108, 92, 255, 0.28), rgba(42, 37, 64, 0.55)),
+    url("bg-image.png");
+  background-size: cover;
+  background-position: center;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: white;
+}
+
+/* TOP BAR */
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* LOGO */
+.logo {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+/* HOME BUTTON */
+.back {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.2s;
+}
+
+.back:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.03);
+}
+
+/* LEFT BOTTOM TEXT */
+.left-bottom p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+/* DOTS NAV */
+.dots span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 5px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+}
+
+.dots .active {
+  background: white;
+}
+
+/* RIGHT PANEL */
+.right {
+  width: 55%;
+  padding: 40px;
+  color: white;
+  overflow-y: auto;
+  height: 100%;
+  padding-right: 20px;
+}
+
+/* FORM */
+.right form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* TITLE */
+.right h1 {
+  margin-bottom: 10px;
+}
+
+/* LOGIN LINK */
+.login-link {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.login-link a {
+  color: #9a8cff;
+  text-decoration: none;
+}
+
+/* INPUTS & SELECT */
+form input,
+form select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: none;
+  background: #3a354b;
+  color: white;
+  outline: none;
+}
+
+form select option {
+  background: #1f1b2e;
+  color: white;
+}
+
+/* NAME ROW */
+.name-fields {
+  display: flex;
+  gap: 10px;
+}
+
+.name-fields input {
+  flex: 1;
+}
+
+/* DISPATCH FIELD */
+#dispatchBox {
+  margin-bottom: 15px;
+}
+
+/* TERMS CHECKBOX */
+.terms {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  margin-bottom: 15px;
+  gap: 8px;
+}
+
+.terms input {
+  width: auto;
+  margin: 0;
+}
+
+/* CREATE BUTTON */
+.create-btn {
+  width: 100%;
+  padding: 12px;
+  background: #6b5cff;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  margin-bottom: 20px;
+}
+
+/* OR DIVIDER */
+.or {
+  text-align: center;
+  font-size: 12px;
+  margin: 10px 0;
+}
+
+/* SOCIAL BUTTONS */
+.socials {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.socials button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.google {
+  background: white;
+}
+
+.apple {
+  background: black;
+  color: white;
+}

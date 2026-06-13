@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Accident</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#0a0f14;
+  color:white;
+  min-height:100vh;
+  overflow-x:hidden;
+  overflow-y:auto;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  padding:20px;
+}
+
+/* GRID BACKGROUND */
+body::before{
+  content:"";
+  position:absolute;
+  width:200%;
+  height:200%;
+  background-image:
+  linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size:60px 60px;
+  animation:gridMove 20s linear infinite;
+  z-index: 1;
+}
+
+@keyframes gridMove{
+  0%{transform:translate(0,0);}
+  100%{transform:translate(-60px,-60px);}
+}
+
+.scanlines{
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:repeating-linear-gradient(
+  to bottom,
+  rgba(255,255,255,0.03),
+  rgba(255,255,255,0.03) 1px,
+  transparent 3px,
+  transparent 6px
+  );
+  opacity:0.15;
+  pointer-events:none;
+  z-index: 2;
+}
+
+.dashboard{
+  width:100%;
+  max-width:900px;
+  z-index:5;
+  position:relative;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:25px;
+  gap: 12px;
+}
+
+.topbar h1{
+  font-size:22px;
+  letter-spacing:3px;
+}
+
+.status{
+  padding:10px 16px;
+  background:rgba(255,255,255,0.05);
+  border-radius:8px;
+  font-size:12px;
+  border:1px solid rgba(255,255,255,0.1);
+  text-align: center;
+}
+
+.home-top-btn{
+  padding:10px 16px;
+  background:#1f2937;
+  border:1px solid rgba(255,255,255,0.1);
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:bold;
+  white-space: nowrap;
+}
+
+.home-top-btn:hover{
+  background:#334155;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:25px;
+}
+
+.panel{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  padding:25px;
+  border-radius:14px;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+
+.form-group{
+  margin-bottom:18px;
+}
+
+label{
+  display:block;
+  margin-bottom:8px;
+  font-size:12px;
+  opacity:0.7;
+  letter-spacing:1px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.05);
+  color:white;
+  border:1px solid rgba(255,255,255,0.08);
+  outline:none;
+  font-size:16px;
+}
+
+button{
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+  transition:0.3s;
+  font-size:14px;
+}
+
+.clear-btn{
+  padding:14px;
+  background:rgba(255,255,255,0.08);
+  color:white;
+  width:100%;
+  margin-top:10px;
+}
+
+.send-btn{
+  padding:16px;
+  background:#ef4444;
+  color:white;
+  width:100%;
+  margin-top:15px;
+  font-size:16px;
+  letter-spacing:1px;
+}
+
+.unit-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:10px;
+}
+
+.unit{
+  padding:16px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  cursor:pointer;
+  text-align:center;
+  transition:0.2s;
+  user-select:none;
+  -webkit-user-select:none;
+  font-size:14px;
+}
+
+.unit:hover{
+  background:rgba(255,255,255,0.08);
+}
+
+.unit.active{
+  border:1px solid #22c55e;
+  background:rgba(34,197,94,0.15);
+  box-shadow:0 0 12px rgba(34,197,94,0.25);
+}
+
+.incident-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.incident{
+  padding:14px 10px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  cursor:pointer;
+  text-align:center;
+  transition:0.2s;
+  font-size:13px;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.incident:hover{
+  background:rgba(255,255,255,0.08);
+}
+
+.incident.active{
+  background:rgba(239,68,68,0.2);
+  border:1px solid #ef4444;
+}
+
+.popup{
+  position:fixed;
+  top:20px;
+  right:-400px;
+  width: calc(100% - 40px);
+  max-width:340px;
+  background:rgba(15,20,28,0.98);
+  border-left:4px solid #22c55e;
+  padding:18px;
+  border-radius:10px;
+  transition:0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index:999;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+.popup.show{
+  right:20px;
+}
+
+@media (max-width: 768px) {
+  body {
+    align-items: flex-start;
+  }
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .topbar div {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .panel {
+    padding: 18px;
+  }
+  .popup {
+    top: auto;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(150%);
+    right: auto;
+    transition: transform 0.4s ease;
+  }
+  .popup.show {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="scanlines"></div>
+<div class="popup" id="popup"></div>
+
+<div class="dashboard">
+
+  <div class="topbar">
+    <h1>USER DASHBOARD</h1>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <div class="status">CONNECTED TO DISPATCH</div>
+      <button class="home-top-btn" onclick="window.location.href='home.html'">HOME</button>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <div class="panel">
+
+      <div class="form-group">
+        <label>FULL NAME</label>
+        <input type="text" id="fullname" placeholder="Enter your name">
+      </div>
+
+      <div class="form-group">
+        <label>CONTACT NUMBER</label>
+        <input type="tel" id="contactNumber" placeholder="Enter phone number">
+      </div>
+
+      <div class="form-group">
+        <label>LOCATION</label>
+        <input type="text" id="location" placeholder="Enter location or press below for GPS location">
+        <button class="clear-btn" onclick="getLocation()">GET GPS LOCATION</button>
+      </div>
+
+      <div class="form-group">
+        <label>INCIDENT TYPE</label>
+        <div class="incident-grid">
+          <div class="incident" onclick="toggleIncident(this)">Car Crash</div>
+          <div class="incident" onclick="toggleIncident(this)">Motorcycle Accident</div>
+          <div class="incident" onclick="toggleIncident(this)">Pedestrian Hit</div>
+          <div class="incident" onclick="toggleIncident(this)">Not Breathing</div>
+          <div class="incident" onclick="toggleIncident(this)">Heart Attack</div>
+          <div class="incident" onclick="toggleIncident(this)">Stroke</div>
+          <div class="incident" onclick="toggleIncident(this)">Unconscious</div>
+          <div class="incident" onclick="toggleIncident(this)">Building Fire</div>
+          <div class="incident" onclick="toggleIncident(this)">Vehicle Fire</div>
+          <div class="incident" onclick="toggleIncident(this)">Wildfire</div>
+          <div class="incident" onclick="toggleIncident(this)">Robbery</div>
+          <div class="incident" onclick="toggleIncident(this)">Assault</div>
+          <div class="incident" onclick="toggleIncident(this)">Break-in</div>
+          <div class="incident" onclick="toggleIncident(this)">Gas Leak</div>
+          <div class="incident" onclick="toggleIncident(this)">Flood</div>
+          <div class="incident" onclick="toggleIncident(this)">Building Collapse</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="panel">
+
+      <label>EMERGENCY UNITS</label>
+      <div class="unit-grid">
+        <div class="unit">Police</div>
+        <div class="unit">Firefighter</div>
+        <div class="unit">Ambulance</div>
+        <div class="unit">Rescue Team</div>
+        <div class="unit">Hazard Control</div>
+      </div>
+
+      <button class="send-btn" onclick="sendReport()">
+        SEND EMERGENCY
+      </button>
+
+      <button
+        id="motionBtn"
+        class="clear-btn"
+        style="background:#2563eb; margin-top:10px;"
+        onclick="enableMotionDetection()"
+      >
+        ENABLE AUTO DETECTION
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= FIREBASE DATABASE CONNECTION CONTEXT ================= -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCO9jXDjuNAVG7sqEq7M1vh42bsD_n60XQ",
+  authDomain: "wera-5d7af.firebaseapp.com",
+  projectId: "wera-5d7af",
+  storageBucket: "wera-5d7af.firebasestorage.app",
+  messagingSenderId: "975783139434",
+  appId: "1:975783139434:web:46ca6c60ee985492421213",
+  measurementId: "G-QEFP3J2LPY"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let watchId = null;
+let detectionEnabled = false;
+
+/* GPS CONTROLLER */
+window.getLocation = function() {
+  const input = document.getElementById("location");
+  input.value = "Locking onto satellites...";
+
+  if(!navigator.geolocation){
+    input.value = "GPS not supported";
+    return;
+  }
+
+  if (watchId !== null) {
+    navigator.geolocation.clearWatch(watchId);
+  }
+
+  watchId = navigator.geolocation.watchPosition(
+    (pos)=>{
+      const lat = pos.coords.latitude.toFixed(6);
+      const lon = pos.coords.longitude.toFixed(6);
+      const accuracy = pos.coords.accuracy.toFixed(1);
+
+      if(accuracy > 30) {
+        input.value = `${lat}, ${lon} (Calibrating... ±${accuracy}m)`;
+      } else {
+        input.value = `${lat}, ${lon} (Precision: ±${accuracy}m)`;
+      }
+    },
+    (error)=>{
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          input.value = "GPS Failed: Access Denied";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          input.value = "GPS Failed: Network Signal Low";
+          break;
+        case error.TIMEOUT:
+          input.value = "GPS Failed: Lock Timeout";
+          break;
+        default:
+          input.value = "GPS failed";
+      }
+    },
+    { 
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0   
+    }
+  );
+};
+
+/* SELECTION TRACKERS */
+document.querySelectorAll(".unit").forEach(u=>{
+  u.addEventListener("click",()=>{
+    u.classList.toggle("active");
+  });
+});
+
+window.toggleIncident = function(el){
+  el.classList.toggle("active");
+};
+
+/* POPUP UI */
+window.showPopup = function(message){
+  const popup = document.getElementById("popup");
+  popup.innerHTML = `<h2>${message}</h2>`;
+  popup.classList.add("show");
+
+  setTimeout(()=>{
+    popup.classList.remove("show");
+  },3000);
+};
+
+/* LIVE CLOUD DISPATCH TRANSMITTER */
+window.sendReport = async function() {
+  const popup = document.getElementById("popup");
+  const name = document.getElementById("fullname").value;
+  const contact = document.getElementById("contactNumber").value;
+  const locationVal = document.getElementById("location").value;
+
+  const units = [...document.querySelectorAll(".unit.active")].map(e=>e.innerText);
+  const incidents = [...document.querySelectorAll(".incident.active")].map(e=>e.innerText);
+
+  const reportId = "REP_" + Date.now();
+
+  const report = {
+    id: reportId,
+    name: name || "Anonymous",
+    contact: contact || "Not provided",
+    location: locationVal || "Unknown Location",
+    assignedUnits: units,
+    incidents: incidents.length > 0 ? incidents : ["Emergency Call"],
+    status: "PENDING",
+    time: new Date().toLocaleTimeString()
+  };
+
+  try {
+    // Write directly into Firestore database mapping
+    await setDoc(doc(db, "wera_reports", reportId), report);
+
+    popup.innerHTML = `
+      <h2>🚨 EMERGENCY SENT</h2>
+      <p style="margin-top:8px;"><b>Name:</b> ${report.name}</p>
+      <p><b>Contact:</b> ${report.contact}</p>
+      <p><b>Location:</b> ${report.location}</p>
+      <p><b>Units Required:</b> ${units.join(", ") || "None selected"}</p>
+      <p><b>Incident:</b> ${report.incidents.join(", ")}</p>
+      <p style="margin-top:4px; color:#22c55e; font-weight:bold;">Status: Synced with Dispatch Cloud</p>
+    `;
+    popup.classList.add("show");
+
+    setTimeout(()=>{
+      popup.classList.remove("show");
+    },4500);
+
+  } catch(err) {
+    console.error("Firebase Cloud Write Error: ", err);
+    window.showPopup("❌ Broadcast Error: Check Firebase configuration rules.");
+  }
+};
+
+/* ACCELEROMETER MOTION ENGINE */
+const IMPACT_THRESHOLD = 25;
+
+window.enableMotionDetection = function() {
+  const btn = document.getElementById("motionBtn");
+
+  if(detectionEnabled){
+    window.showPopup("⚠️ Auto Detection Already Enabled");
+    return;
+  }
+
+  startDetection();
+  detectionEnabled = true;
+  btn.innerText = "AUTO DETECTION ENABLED";
+  btn.style.background = "#22c55e";
+  window.showPopup("✅ Motion Detection Enabled");
+};
+
+function startDetection(){
+  window.addEventListener("devicemotion",(event)=>{
+    const a = event.accelerationIncludingGravity;
+    if(!a) return;
+
+    const force = Math.sqrt(
+      (a.x || 0) ** 2 +
+      (a.y || 0) ** 2 +
+      (a.z || 0) ** 2
+    );
+
+    if(force > IMPACT_THRESHOLD){
+      window.showPopup("🚨 Impact Force Tracked!");
+      window.sendReport();
+
+      if(navigator.vibrate){
+        navigator.vibrate([300,100,300]);
+      }
+    }
+  });
+}
+</script>
+
+</body>
+</html>

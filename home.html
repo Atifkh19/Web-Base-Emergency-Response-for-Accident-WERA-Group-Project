@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WERA - Home Page</title>
+
+<style>
+/* RESET */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+/* BODY */
+body{
+  background:#040b1c;
+  color:white;
+}
+
+/* LINKS */
+a{
+  text-decoration:none;
+  color:white;
+}
+
+/* === NAVIGATION === */
+header{
+  width:100%;
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:100;
+  padding:20px 70px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo h1{
+  color:#ff2d2d;
+  font-size:42px;
+  font-weight:800;
+}
+
+.logo span{
+  font-size:14px;
+  line-height:1.2;
+  color:#ddd;
+}
+
+nav{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+/* BUTTONS */
+.btn{
+  padding:12px 22px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+  border:1px solid #666;
+  background:transparent;
+  color:white;
+  cursor:pointer;
+  transition:0.3s;
+  display:inline-block;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+  border-color:#ff2d2d;
+}
+
+/* === HERO SECTION === */
+.hero{
+  width:100%;
+  min-height:100vh;
+  background:
+    linear-gradient(to right, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.4)),
+    url('homebg-image.png') center/cover no-repeat;
+  display:flex;
+  align-items:center;
+  padding:140px 70px 80px;
+}
+
+.hero-content{
+  max-width:600px;
+}
+
+.hero-content h2{
+  font-size:70px;
+  line-height:1.1;
+  margin-bottom:20px;
+  font-weight:800;
+}
+
+.hero-content h2 span{
+  color:#ff2d2d;
+}
+
+.hero-content p{
+  color:#d0d0d0;
+  line-height:1.8;
+  font-size:18px;
+  margin-bottom:40px;
+}
+
+/* FEATURE BLOCKS */
+.features{
+  display:flex;
+  gap:40px;
+  flex-wrap:wrap;
+}
+
+.feature{
+  display:flex;
+  align-items:flex-start;
+  gap:15px;
+}
+
+.feature-icon{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  background:#161d35;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#ff2d2d;
+  font-size:24px;
+}
+
+.feature h4{
+  margin-bottom:6px;
+  font-size:18px;
+}
+
+.feature p{
+  margin:0;
+  font-size:14px;
+  color:#aaa;
+  line-height:1.5;
+}
+
+/* === GENERAL SECTION === */
+section{
+  padding:80px 70px;
+}
+
+.section-title{
+  text-align:center;
+  font-size:38px;
+  margin-bottom:50px;
+  position:relative;
+  font-weight:700;
+}
+
+.section-title::after{
+  content:'';
+  width:80px;
+  height:4px;
+  background:#ff2d2d;
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:-15px;
+  border-radius:10px;
+}
+
+/* ISSUES GRID */
+.issues-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:25px;
+}
+
+.issue-card{
+  background:#0c1429;
+  padding:35px 25px;
+  border-radius:18px;
+  text-align:center;
+  transition:0.3s;
+}
+
+.issue-card:hover{
+  transform:translateY(-8px);
+}
+
+.issue-card i{
+  font-size:40px;
+  color:#ff2d2d;
+  margin-bottom:20px;
+  display:block;
+}
+
+.issue-card h3{
+  margin-bottom:12px;
+  font-size:22px;
+}
+
+.issue-card p{
+  color:#b9b9b9;
+  line-height:1.7;
+  font-size:15px;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  header{
+    flex-direction:column;
+    gap:20px;
+    padding:20px;
+  }
+
+  .hero{
+    padding-top:240px;
+    padding-left:25px;
+    padding-right:25px;
+  }
+
+  .hero-content h2{
+    font-size:48px;
+  }
+
+  section{
+    padding:70px 25px;
+  }
+
+  nav{
+    justify-content:center;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<header>
+  <div class="logo">
+    <h1>WERA</h1>
+    <span>Web-based Emergency Response <br> for Accidents</span>
+  </div>
+
+  <nav>
+    <a class="btn" href="index.html">CREATE ACCOUNT</a>
+    <a class="btn" href="login.html">LOGIN</a>
+    <a class="btn" href="#" onclick="goUser()">USER PAGE</a>
+    <a class="btn" href="#" onclick="goDispatch()">DISPATCH</a>
+    <a class="btn" href="#">CONTACT</a>
+    <a class="btn" href="#" onclick="logout()" id="logoutBtn" style="display:none;">LOGOUT</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <h2>Every Second <br> <span>Can Save a Life</span></h2>
+    <p>
+      Our system instantly detects emergencies and sends your location and important information to the nearest emergency services. Faster response, better care, bigger impact.
+    </p>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">📍</div>
+        <div>
+          <h4>Real-time Location</h4>
+          <p>Exact GPS location is shared instantly with responders.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">❤</div>
+        <div>
+          <h4>Personal Information</h4>
+          <p>Medical and personal information helps provide better care.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ISSUES -->
+<section>
+  <h2 class="section-title">Issues People Face in Emergencies</h2>
+  <div class="issues-grid">
+    <div class="issue-card">
+      <i>🕒</i>
+      <h3>Slow Response</h3>
+      <p>Emergency teams sometimes take too long to reach the incident location.</p>
+    </div>
+    <div class="issue-card">
+      <i>📍</i>
+      <h3>Unknown Location</h3>
+      <p>Victims may not know their exact location during critical situations.</p>
+    </div>
+    <div class="issue-card">
+      <i>🩺</i>
+      <h3>Missing Medical Info</h3>
+      <p>Paramedics may not know the patient’s medical history or conditions.</p>
+    </div>
+    <div class="issue-card">
+      <i>🛣</i>
+      <h3>Remote Areas</h3>
+      <p>Emergencies in remote or desert areas are harder to detect and reach quickly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SESSION LOGIC -->
+<script>
+// HELPERS
+function getSession(){
+  return JSON.parse(localStorage.getItem("session"));
+}
+
+// USER GATE
+function goUser(){
+  const s = getSession();
+  if(!s || !s.loggedIn){
+    alert("Please login first");
+    window.location.href = "login.html";
+    return;
+  }
+  if(s.role !== "user"){
+    alert("Access denied: USER only");
+    return;
+  }
+  window.location.href = "user.html";
+}
+
+// DISPATCH GATE
+function goDispatch(){
+  const s = getSession();
+  if(!s || !s.loggedIn){
+    alert("Please login first");
+    window.location.href = "login.html";
+    return;
+  }
+  if(s.role !== "dispatch"){
+    alert("Access denied: DISPATCH only");
+    return;
+  }
+  window.location.href = "dispatch.html";
+}
+
+// LOGOUT
+function logout(){
+  localStorage.removeItem("session");
+  alert("Logged out successfully");
+  window.location.href = "home.html";
+}
+
+// UI UPDATE
+(function updateUI(){
+  const s = getSession();
+  if(s && s.loggedIn){
+    document.getElementById("logoutBtn").style.display = "inline-block";
+  }
+})();
+</script>
+
+</body>
+</html>
