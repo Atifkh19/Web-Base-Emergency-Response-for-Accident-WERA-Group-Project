@@ -33,13 +33,22 @@
     }
 
     /* LEFT PANEL */
+  /* LEFT PANEL */
     .left {
       flex: 1;
-      background: linear-gradient(145deg, #0a1025, #050a1a);
+      /* Add background image with overlay */
+      background: linear-gradient(rgba(4, 11, 28, 0.8), rgba(4, 11, 28, 0.8)), 
+                  url('bg-image.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      
       padding: 35px 30px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      /* Optional: ensures text remains readable if the image is light */
+      color: white; 
     }
 
     .top {
